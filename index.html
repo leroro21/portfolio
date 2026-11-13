@@ -1,0 +1,80 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f8fc">
+  <meta name="description" content="leroro’s reading journal. Papers, books, and articles on programming.">
+  <title>leroro — Reading journal</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./data.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#library">Skip to library</a>
+  <header class="site-header wrap">
+    <a class="profile" href="#" aria-label="leroro home">
+      <div class="avatar">
+        <span id="avatar-fallback" aria-hidden="true">l</span>
+        <img id="profile-photo" data-src="./assets/avatar.jpg" alt="Portrait of leroro" width="48" height="48" hidden>
+      </div>
+      <div>
+        <span class="profile-name">leroro</span>
+        <span class="subtitle">Personal reading journal</span>
+      </div>
+    </a>
+    <nav aria-label="Main navigation"><a href="#library">Library</a><a href="#up-next">To read <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main class="wrap">
+    <section class="intro" aria-labelledby="intro-title">
+      <div>
+        <p class="eyebrow">PROGRAMMING</p>
+        <h1 id="intro-title">What I’m reading<br>and <span>learning.</span></h1>
+        <p class="intro-description">Papers, books, and articles I’ve read about programming.<br class="desktop-break"> Plus a list of what I want to read next.</p>
+      </div>
+      <div class="journal-stats" aria-label="Reading statistics">
+        <p>Reading stats</p>
+        <dl>
+          <div><dt>Read</dt><dd id="stat-read">—</dd></div>
+          <div><dt>Topics</dt><dd id="stat-topics">—</dd></div>
+          <div><dt>To read</dt><dd id="stat-planned">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <div class="content-grid">
+      <section id="library" aria-labelledby="read-heading">
+        <div class="section-heading"><h2 id="read-heading">Library <span class="count" id="read-count"></span></h2><span class="section-caption">Already read</span></div>
+        <div class="tag-picker" id="tag-picker">
+          <div class="filter-heading"><label class="filter-label" for="tag-search">Filter by tags</label><button type="button" id="clear-tags" hidden>Clear all</button></div>
+          <div class="tag-control">
+            <div class="tag-field" id="tag-field">
+              <div id="selected-tags" class="selected-tags"></div>
+              <input id="tag-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="tag-options" aria-describedby="tag-hint" placeholder="Search or select tags…" autocomplete="off" spellcheck="false">
+              <button type="button" id="toggle-tags" aria-label="Show tags" aria-controls="tag-options" aria-expanded="false"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg></button>
+            </div>
+            <div id="tag-dropdown" class="tag-dropdown" hidden>
+              <ul id="tag-options" role="listbox" aria-label="Tags" aria-multiselectable="true"></ul>
+              <p id="no-tags" role="status" hidden>No tags found.</p>
+            </div>
+          </div>
+          <p id="tag-hint" class="tag-hint" hidden>Showing articles with at least one selected tag.</p>
+        </div>
+        <p id="filter-status" class="sr-only" role="status"></p>
+        <ul id="read-list" class="reading-list"></ul>
+        <p id="read-empty" class="empty" hidden>No matches found.</p>
+      </section>
+
+      <aside id="up-next" aria-labelledby="planned-heading">
+        <div class="next-heading"><span class="bookmark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4h12v17l-6-4-6 4V4Z"/></svg></span><h2 id="planned-heading">To read <span class="count" id="planned-count"></span></h2></div>
+        <p class="aside-description">What I plan to read next.</p>
+        <ul id="planned-list" class="reading-list"></ul>
+        <div id="planned-empty" class="queue-empty" hidden><p>Nothing added yet.</p></div>
+      </aside>
+    </div>
+    <noscript><p class="empty">Enable JavaScript to see the reading list.</p></noscript>
+  </main>
+</body>
+</html>
+
