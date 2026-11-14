@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f8fc">
-  <meta name="description" content="leroro’s reading journal. Papers, books, and articles on programming.">
+  <meta name="description" content="leroro’s reading journal. Papers and books on programming.">
   <title>leroro — Reading journal</title>
   <link rel="icon" href='assets/avatar.jpg' type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
@@ -31,13 +31,13 @@
       <div>
         <p class="eyebrow">PROGRAMMING</p>
         <h1 id="intro-title">What I’m reading<br>and <span>learning.</span></h1>
-        <p class="intro-description">Papers, books, and articles I’ve read about programming.<br class="desktop-break"> Plus a list of what I want to read next.</p>
+        <p class="intro-description">Papers and books I’ve read about programming.<br class="desktop-break"> Plus a list of what I want to read next.</p>
       </div>
       <div class="journal-stats" aria-label="Reading statistics">
         <p>Reading stats</p>
         <dl>
           <div><dt>Read</dt><dd id="stat-read">—</dd></div>
-          <div><dt>Topics</dt><dd id="stat-topics">—</dd></div>
+          <div><dt>Reading now</dt><dd id="stat-reading">—</dd></div>
           <div><dt>To read</dt><dd id="stat-planned">—</dd></div>
         </dl>
       </div>
@@ -46,8 +46,17 @@
     <div class="content-grid">
       <section id="library" aria-labelledby="read-heading">
         <div class="section-heading"><h2 id="read-heading">Library <span class="count" id="read-count"></span></h2><span class="section-caption">Already read</span></div>
+        <div class="library-filters">
+        <div class="type-picker" role="group" aria-labelledby="type-label">
+          <div class="filter-heading"><span class="filter-label" id="type-label">Material type</span></div>
+          <div class="type-options" id="type-options">
+            <button type="button" data-type="all" aria-pressed="true">All</button>
+            <button type="button" data-type="Book" aria-pressed="false">Books</button>
+            <button type="button" data-type="Paper" aria-pressed="false">Papers</button>
+          </div>
+        </div>
         <div class="tag-picker" id="tag-picker">
-          <div class="filter-heading"><label class="filter-label" for="tag-search">Filter by tags</label><button type="button" id="clear-tags" hidden>Clear all</button></div>
+          <div class="filter-heading"><label class="filter-label" for="tag-search">Topic tags</label><button type="button" id="clear-tags" hidden>Clear tags</button></div>
           <div class="tag-control">
             <div class="tag-field" id="tag-field">
               <div id="selected-tags" class="selected-tags"></div>
@@ -59,19 +68,31 @@
               <p id="no-tags" role="status" hidden>No tags found.</p>
             </div>
           </div>
-          <p id="tag-hint" class="tag-hint" hidden>Showing articles with at least one selected tag.</p>
+          <p id="tag-hint" class="tag-hint" hidden>Matches any selected tag within the chosen material type.</p>
+        </div>
         </div>
         <p id="filter-status" class="sr-only" role="status"></p>
+        <p class="filter-scope">Filters apply to the library only.</p>
         <ul id="read-list" class="reading-list"></ul>
         <p id="read-empty" class="empty" hidden>No matches found.</p>
       </section>
 
+      <div class="reading-sidebar">
+      <aside id="reading-now" aria-labelledby="reading-heading">
+        <div class="next-heading"><h2 id="reading-heading">Reading now <span class="count" id="reading-count"></span></h2></div>
+        <p class="aside-description">What I’m working through right now.</p>
+        <ul id="reading-list" class="reading-list"></ul>
+        <nav id="reading-pagination" class="queue-pagination" aria-label="Reading now pages" hidden></nav>
+        <p id="reading-empty" class="queue-empty" hidden>Nothing in progress yet.</p>
+      </aside>
       <aside id="up-next" aria-labelledby="planned-heading">
         <div class="next-heading"><span class="bookmark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4h12v17l-6-4-6 4V4Z"/></svg></span><h2 id="planned-heading">To read <span class="count" id="planned-count"></span></h2></div>
         <p class="aside-description">What I plan to read next.</p>
         <ul id="planned-list" class="reading-list"></ul>
+        <nav id="planned-pagination" class="queue-pagination" aria-label="To read pages" hidden></nav>
         <div id="planned-empty" class="queue-empty" hidden><p>Nothing added yet.</p></div>
       </aside>
+      </div>
     </div>
     <noscript><p class="empty">Enable JavaScript to see the reading list.</p></noscript>
   </main>

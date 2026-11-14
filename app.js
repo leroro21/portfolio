@@ -35,39 +35,88 @@
   function renderEntry(entry) {
     const rated = typeof entry.rating === "number" && entry.rating >= 1 && entry.rating <= 5;
     const meta = [entry.author, entry.year];
+    let finished = "";
     if (entry.status === "read" && entry.finishedOn) {
       const monthOnly = /^\d{4}-\d{2}$/.test(entry.finishedOn);
       const date = new Date(`${entry.finishedOn}${monthOnly ? "-01" : ""}T12:00:00`);
       if (!Number.isNaN(date.getTime())) {
         const options = { year: "numeric", month: "long" };
         if (!monthOnly) options.day = "numeric";
-        meta.push(`Finished ${date.toLocaleDateString("en", options)}`);
+        finished = `<p class="finished-date"><span aria-hidden="true">✓</span><span>Finished <time datetime="${escape(entry.finishedOn)}">${escape(date.toLocaleDateString("en", options))}</time></span></p>`;
       }
     }
     return `<li class="entry">
-      <div class="entry-top"><span class="entry-kind"><svg class="paper-icon" viewBox="0 0 20 22" fill="none" aria-hidden="true"><path d="M4 2h8l4 4v14H4V2Z M12 2v5h4 M7 11h6 M7 15h6"/></svg>${escape(entry.type || "Article")}${entry.publisher ? ` <span aria-hidden="true">·</span> ${escape(entry.publisher)}` : ""}</span><span class="status"><span aria-hidden="true">✓</span> ${entry.understanding === "understood" ? "Understood" : "Read"}</span></div>
+      <div class="entry-top"><span class="entry-kind"><svg class="paper-icon" viewBox="0 0 20 22" fill="none" aria-hidden="true"><path d="M4 2h8l4 4v14H4V2Z M12 2v5h4 M7 11h6 M7 15h6"/></svg>${escape(entry.type || "Paper")}${entry.publisher ? ` <span aria-hidden="true">·</span> ${escape(entry.publisher)}` : ""}</span><span class="status"><span aria-hidden="true">✓</span> ${entry.understanding === "understood" ? "Understood" : "Read"}</span></div>
       <h3><a href="${sourceUrl(entry.url)}" target="_blank" rel="noopener noreferrer">${escape(entry.title)}</a></h3>
       <p class="entry-meta">${meta.filter(Boolean).map(escape).join(" · ")}</p>
       ${entry.summary ? `<p class="entry-description">${escape(entry.summary)}</p>` : ""}
-      <div class="entry-footer"><div class="entry-tags">${getTags(entry).map(tag => `<span class="tag">${escape(tag)}</span>`).join("")}</div><div class="entry-actions">${rated ? `<span class="rating" aria-label="Rating: ${entry.rating} out of 5">${entry.rating}/5</span>` : ""}<a class="source-link" href="${sourceUrl(entry.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escape(entry.title)} in a new tab">Open ${escape((entry.type || "article").toLowerCase())} <span aria-hidden="true">↗</span></a></div></div>
+      ${finished}
+      <div class="entry-footer"><div class="entry-tags">${getTags(entry).map(tag => `<span class="tag">${escape(tag)}</span>`).join("")}</div><div class="entry-actions">${rated ? `<span class="rating" aria-label="Rating: ${entry.rating} out of 5">${entry.rating}/5</span>` : ""}<a class="source-link" href="${sourceUrl(entry.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escape(entry.title)} in a new tab">Open ${escape((entry.type || "paper").toLowerCase())} <span aria-hidden="true">↗</span></a></div></div>
       ${entry.notes ? `<details class="notes"><summary>Notes</summary><p>${escape(entry.notes)}</p></details>` : ""}
     </li>`;
   }
 
   const completed = entries.filter(entry => entry.status === "read");
-  const planned = entries.filter(entry => ["reading", "planned"].includes(entry.status));
-  const topics = [...new Set(completed.map(entry => entry.topic || "General"))];
+  const reading = entries.filter(entry => entry.status === "reading");
+  const planned = entries.filter(entry => entry.status === "planned");
   const tags = [...new Set(completed.flatMap(getTags))].sort((a, b) => a.localeCompare(b, "en"));
 
   const selectedTags = new Set();
+  let selectedType = "all";
+
+  function matchesFilters(entry) {
+    return (selectedType === "all" || (entry.type || "Paper") === selectedType)
+      && (!selectedTags.size || [...selectedTags].some(tag => getTags(entry).includes(tag)));
+  }
+
+  function renderQueue(entry) {
+    return `<li class="queue-entry"><span class="material-type">${escape(entry.type || "Paper")}</span><h3><a href="${sourceUrl(entry.url)}" target="_blank" rel="noopener noreferrer">${escape(entry.title)} ↗</a></h3><p class="entry-meta">${escape(entry.author)}</p><div class="entry-tags">${getTags(entry).map(tag => `<span class="tag">${escape(tag)}</span>`).join("")}</div></li>`;
+  }
 
   function renderLibrary() {
-    const visible = completed.filter(entry => !selectedTags.size || [...selectedTags].some(tag => getTags(entry).includes(tag)));
+    const visible = completed.filter(matchesFilters);
     document.querySelector("#read-list").innerHTML = visible.map(renderEntry).join("");
     document.querySelector("#read-count").textContent = visible.length;
     document.querySelector("#read-empty").hidden = visible.length > 0;
-    document.querySelector("#filter-status").textContent = `${visible.length} ${visible.length === 1 ? "read" : "reads"} shown${selectedTags.size ? ` tagged ${[...selectedTags].join(", ")}` : ""}`;
+    document.querySelector("#filter-status").textContent = `${visible.length} completed materials shown. Type: ${selectedType}${selectedTags.size ? `. Tags: ${[...selectedTags].join(", ")}` : ""}`;
   }
+
+  for (const [prefix, materials] of [["reading", reading], ["planned", planned]]) {
+    const pageSize = 2;
+    const pageCount = Math.ceil(materials.length / pageSize);
+    let page = 0;
+    const list = document.querySelector(`#${prefix}-list`);
+    const pager = document.querySelector(`#${prefix}-pagination`);
+    const label = prefix === "reading" ? "Reading now" : "To read";
+    pager.innerHTML = `<button type="button" data-direction="previous" aria-label="${label}: previous page" aria-controls="${prefix}-list"><span aria-hidden="true">←</span></button><span class="page-status" role="status" aria-atomic="true"></span><button type="button" data-direction="next" aria-label="${label}: next page" aria-controls="${prefix}-list"><span aria-hidden="true">→</span></button>`;
+    pager.hidden = pageCount <= 1;
+    const previous = pager.querySelector('[data-direction="previous"]');
+    const next = pager.querySelector('[data-direction="next"]');
+    function renderPage() {
+      list.innerHTML = materials.slice(page * pageSize, (page + 1) * pageSize).map(renderQueue).join("");
+      pager.querySelector(".page-status").textContent = pageCount ? `${page + 1} / ${pageCount}` : "";
+      previous.disabled = page === 0;
+      next.disabled = page >= pageCount - 1;
+    }
+    pager.addEventListener("click", event => {
+      const button = event.target.closest("button[data-direction]");
+      if (!button || button.disabled) return;
+      page += button.dataset.direction === "next" ? 1 : -1;
+      renderPage();
+      if (button.disabled) (button === next ? previous : next).focus({ preventScroll: true });
+    });
+    renderPage();
+    document.querySelector(`#${prefix}-count`).textContent = materials.length;
+    document.querySelector(`#${prefix}-empty`).hidden = materials.length > 0;
+  }
+
+  document.querySelector("#type-options").addEventListener("click", event => {
+    const button = event.target.closest("button[data-type]");
+    if (!button) return;
+    selectedType = button.dataset.type;
+    document.querySelectorAll("#type-options button").forEach(option => option.setAttribute("aria-pressed", String(option === button)));
+    renderLibrary();
+  });
 
   const picker = document.querySelector("#tag-picker");
   const input = document.querySelector("#tag-search");
@@ -192,11 +241,8 @@
     if (!picker.contains(event.relatedTarget)) setOpen(false);
   });
   document.querySelector("#stat-read").textContent = completed.length;
-  document.querySelector("#stat-topics").textContent = topics.length;
+  document.querySelector("#stat-reading").textContent = reading.length;
   document.querySelector("#stat-planned").textContent = planned.length;
-  document.querySelector("#planned-count").textContent = planned.length;
-  document.querySelector("#planned-empty").hidden = planned.length > 0;
-  document.querySelector("#planned-list").innerHTML = planned.map(entry => `<li class="queue-entry">${entry.status === "reading" ? '<span class="queue-status">Reading now</span>' : ""}<h3><a href="${sourceUrl(entry.url)}" target="_blank" rel="noopener noreferrer">${escape(entry.title)} ↗</a></h3><p class="entry-meta">${[entry.author, entry.type].filter(Boolean).map(escape).join(" · ")}</p></li>`).join("");
   renderLibrary();
 })();
 
