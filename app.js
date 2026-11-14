@@ -46,9 +46,8 @@
       }
     }
     return `<li class="entry">
-      <div class="entry-top"><span class="entry-kind"><svg class="paper-icon" viewBox="0 0 20 22" fill="none" aria-hidden="true"><path d="M4 2h8l4 4v14H4V2Z M12 2v5h4 M7 11h6 M7 15h6"/></svg>${escape(entry.type || "Paper")}${entry.publisher ? ` <span aria-hidden="true">·</span> ${escape(entry.publisher)}` : ""}</span><span class="status"><span aria-hidden="true">✓</span> ${entry.understanding === "understood" ? "Understood" : "Read"}</span></div>
-      <h3><a href="${sourceUrl(entry.url)}" target="_blank" rel="noopener noreferrer">${escape(entry.title)}</a></h3>
-      <p class="entry-meta">${meta.filter(Boolean).map(escape).join(" · ")}</p>
+      <div class="entry-top"><h3><a href="${sourceUrl(entry.url)}" target="_blank" rel="noopener noreferrer">${escape(entry.title)}</a></h3>${entry.understanding === "understood" ? '<span class="status"><span aria-hidden="true">✓</span> Understood</span>' : ""}</div>
+      <p class="entry-meta"><span class="entry-kind">${[entry.type || "Paper", entry.publisher].filter(Boolean).map(escape).join(" · ")}</span><span>${meta.filter(Boolean).map(escape).join(" · ")}</span></p>
       ${entry.summary ? `<p class="entry-description">${escape(entry.summary)}</p>` : ""}
       ${finished}
       <div class="entry-footer"><div class="entry-tags">${getTags(entry).map(tag => `<span class="tag">${escape(tag)}</span>`).join("")}</div><div class="entry-actions">${rated ? `<span class="rating" aria-label="Rating: ${entry.rating} out of 5">${entry.rating}/5</span>` : ""}<a class="source-link" href="${sourceUrl(entry.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escape(entry.title)} in a new tab">Open ${escape((entry.type || "paper").toLowerCase())} <span aria-hidden="true">↗</span></a></div></div>
