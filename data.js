@@ -7,6 +7,19 @@
 // Entries appear in array order. Add new entries at the beginning.
 window.readingJournal = [
   {
+    id: "ubiquitous-b-tree",
+    title: "The Ubiquitous B-Tree",
+    author: "Douglas Comer",
+    type: "Paper",
+    topic: "Databases",
+    tags: ["B-trees", "Indexing", "Data structures"],
+    url: "https://carlosproal.com/ir/papers/p121-comer.pdf",
+    status: "reading",
+    rating: null,
+    finishedOn: null,
+    notes: ""
+  },
+  {
     id: "java-fork-join",
     title: "A Java Fork/Join Framework",
     author: "Doug Lea",
